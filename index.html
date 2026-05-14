@@ -82,24 +82,27 @@ const CENTER_LON = 51.9238;
 const API_URL = "https://tazakaspiyy.onrender.com";
 
 async function loadStats() {
-   const r = await fetch(API_URL + '/api/stats');
+    const r = await fetch(API_URL + '/api/stats');
     const d = await r.json();
     document.getElementById('total-kg').innerText = d.total_kg?.toFixed(1) || '0';
     document.getElementById('total-cleanups').innerText = d.total_cleanups || '0';
     document.getElementById('total-spots').innerText = d.total_spots || '0';
     document.getElementById('total-volunteers').innerText = d.total_volunteers || '0';
 }
+
 async function loadMap() {
     const map = L.map('map').setView([CENTER_LAT, CENTER_LON], 11);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-    const rc = await fetch('/api/cleanups');
+    
+    const rc = await fetch(API_URL + '/api/cleanups');
     const cleanups = await rc.json();
     cleanups.forEach(c => {
         L.circleMarker([c.lat, c.lon], { color: '#27ae60', fillColor: '#27ae60', fillOpacity: 0.7, radius: 8 })
          .addTo(map)
          .bindPopup('<b>✅ Убрано</b><br>' + c.location + '<br>' + c.date + '<br>' + c.volunteer + '<br>' + (c.weight_kg?.toFixed(1) || 0) + ' кг');
     });
-    const r = await fetch(API_URL + '/api/spots');;
+    
+    const rs = await fetch(API_URL + '/api/spots');
     const spots = await rs.json();
     spots.forEach(s => {
         L.circleMarker([s.lat, s.lon], { color: '#e74c3c', fillColor: '#e74c3c', fillOpacity: 0.7, radius: 8 })
@@ -107,15 +110,17 @@ async function loadMap() {
          .bindPopup('<b>📍 Свалка</b><br>' + s.desc + '<br>Сообщил: ' + s.reporter + '<br>' + s.date);
     });
 }
+
 async function loadCharts() {
-   const r = await fetch(API_URL + '/api/monthly');
+    const rm = await fetch(API_URL + '/api/monthly');
     const monthly = await rm.json();
     new Chart(document.getElementById('monthChart'), {
         type: 'bar',
         data: { labels: monthly.labels, datasets: [{ label: 'Кг мусора', data: monthly.kg, backgroundColor: '#0096c7' }] },
         options: { responsive: true, scales: { y: { beginAtZero: true } } }
     });
-   const r = await fetch(API_URL + '/api/bytype');
+    
+    const rt = await fetch(API_URL + '/api/bytype');
     const bt = await rt.json();
     new Chart(document.getElementById('typeChart'), {
         type: 'doughnut',
@@ -123,6 +128,7 @@ async function loadCharts() {
         options: { responsive: true }
     });
 }
+
 async function loadLeaderboard() {
     const r = await fetch(API_URL + '/api/leaders');
     const rows = await r.json();
@@ -133,6 +139,7 @@ async function loadLeaderboard() {
              + '<td>' + u.group + '</td><td><b>' + u.kg.toFixed(1) + '</b></td><td>' + u.cleanups + '</td></tr>';
     }).join('');
 }
+
 async function loadGroups() {
     const r = await fetch(API_URL + '/api/groups');
     const rows = await r.json();
@@ -141,7 +148,6 @@ async function loadGroups() {
         '<tr><td><b>' + g.name + '</b></td><td>' + g.members + '</td><td>' + g.kg.toFixed(1) + '</td><td>' + g.cleanups + '</td></tr>'
     ).join('');
 }
+
 loadStats(); loadMap(); loadCharts(); loadLeaderboard(); loadGroups();
 </script>
-</body>
-</html>
