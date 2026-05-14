@@ -14,14 +14,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 @app.get("/api/stats")
 async def stats():
     cleanups = db.get_cleanups()
