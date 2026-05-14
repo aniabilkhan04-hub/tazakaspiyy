@@ -1,7 +1,18 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 import database as db
 
+app = FastAPI()
+
+# Инициализация базы данных при старте
+db.init_db()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 app = FastAPI()
 
 app.add_middleware(
